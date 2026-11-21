@@ -1,198 +1,267 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>لوحة تحكم RAI</title>
+<title>RAI | لوحة التحكم</title>
 <style>
-:root{--p:#ed4e91;--r:#d92752;--bg:#fff5f8;--ink:#30232b;--muted:#857580;--line:#f0dce4}
+:root{
+ --red:#e50920;
+ --red2:#a90016;
+ --black:#101010;
+ --dark:#191919;
+ --panel:#202020;
+ --bg:#111;
+ --white:#fff;
+ --muted:#aaa;
+ --line:#333;
+}
 *{box-sizing:border-box}
-body{margin:0;font-family:Tahoma,Arial;background:var(--bg);color:var(--ink)}
+body{
+ margin:0;font-family:Tahoma,Arial,sans-serif;
+ background:var(--bg);color:var(--white)
+}
 button,input,textarea,select{font:inherit}
 button{cursor:pointer;border:0}
-.btn{background:linear-gradient(110deg,var(--r),var(--p));color:white;padding:11px 16px;border-radius:10px;font-weight:bold}
-.btn.soft{background:#ffe6ef;color:#c52c62}
-.btn.danger{background:#fff0f0;color:#c22}
-.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 20% 20%,#ffc8dc,transparent 35%),linear-gradient(135deg,#fff7fa,#fbe1eb)}
-.login-card{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:24px;padding:32px;box-shadow:0 18px 55px #8c25401a}
-.brand{font-size:30px;font-weight:900;color:var(--r);text-align:center}
-.sub{text-align:center;color:var(--muted);font-size:13px;margin:8px 0 25px}
-.field{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;margin:7px 0 15px;outline-color:var(--p);background:#fff}
+.btn{
+ background:linear-gradient(110deg,var(--red2),var(--red));
+ color:white;padding:11px 17px;border-radius:9px;
+ font-weight:bold
+}
+.btn:hover{filter:brightness(1.15)}
+.btn.soft{background:#333;color:#fff;border:1px solid #555}
+.btn.danger{background:#3a171b;color:#ff737e;border:1px solid #70232c}
+.field{
+ width:100%;padding:12px;border:1px solid #444;
+ border-radius:9px;margin:7px 0 15px;
+ outline-color:var(--red);background:#171717;color:#fff
+}
+.field:focus{border-color:var(--red)}
 label{font-size:13px;font-weight:bold}
-.hint{font-size:11px;color:var(--muted);line-height:1.8}
+.hint{font-size:11px;color:var(--muted);line-height:1.9}
+.login{
+ min-height:100vh;display:grid;place-items:center;
+ padding:20px;
+ background:radial-gradient(circle at 20% 20%,#5b0710,transparent 35%),#090909
+}
+.login-card{
+ width:min(420px,100%);background:#181818;
+ border:1px solid #4a2529;border-radius:20px;
+ padding:32px;box-shadow:0 18px 55px #0008
+}
+.brand{text-align:center;font-size:36px;font-weight:900;color:var(--red)}
+.sub{text-align:center;color:#aaa;font-size:13px;margin:8px 0 25px}
 .app{display:none;min-height:100vh}
-.sidebar{position:fixed;right:0;top:0;bottom:0;width:245px;background:linear-gradient(180deg,#d92752,#ed4e91);color:#fff;padding:25px 16px;overflow:auto}
-.sidebrand{font-size:27px;font-weight:900;padding:0 12px 25px}
-.sidebrand small{display:block;font-size:11px;font-weight:normal;opacity:.8}
-.navbtn{display:block;width:100%;text-align:right;background:transparent;color:#ffeaf1;padding:13px;border-radius:10px;margin:4px 0}
-.navbtn.active,.navbtn:hover{background:#ffffff25;color:#fff}
+.sidebar{
+ position:fixed;right:0;top:0;bottom:0;width:245px;
+ background:#090909;border-left:1px solid #333;
+ padding:25px 16px;overflow:auto
+}
+.sidebrand{
+ font-size:30px;font-weight:900;color:var(--red);
+ padding:0 12px 25px;border-bottom:1px solid #333;margin-bottom:18px
+}
+.sidebrand small{display:block;color:#aaa;font-size:11px;font-weight:normal}
+.navbtn{
+ display:block;width:100%;text-align:right;
+ background:transparent;color:#ccc;padding:14px;
+ border-radius:9px;margin:5px 0
+}
+.navbtn.active,.navbtn:hover{background:#4a1018;color:white;border-right:3px solid var(--red)}
 .main{margin-right:245px;padding:25px;max-width:1500px}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:12px}
 .topbar h1{font-size:24px;margin:0}
 .muted{color:var(--muted);font-size:12px}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.card,.box{background:white;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 5px 20px #85213a08}
-.statnum{font-size:26px;font-weight:bold;color:var(--r);margin-top:10px}
+.card,.box{
+ background:var(--panel);border:1px solid var(--line);
+ border-radius:14px;padding:18px;
+ box-shadow:0 5px 20px #0003
+}
+.statnum{font-size:27px;font-weight:bold;color:var(--red);margin-top:12px}
 .cols{display:grid;grid-template-columns:1.3fr 1fr;gap:15px}
 .box h3{margin:0 0 16px;font-size:16px}
 .tablewrap{overflow:auto}
 table{width:100%;border-collapse:collapse;min-width:600px}
-th,td{text-align:right;padding:12px;border-bottom:1px solid #f4e7ec;font-size:13px}
-th{color:var(--muted);font-weight:600}
-.tag{background:#fff0f5;color:#c52c62;padding:5px 9px;border-radius:20px;font-size:11px}
+th,td{text-align:right;padding:12px;border-bottom:1px solid #383838;font-size:13px}
+th{color:#aaa;font-weight:600}
+.tag{background:#45151c;color:#ff818b;padding:6px 10px;border-radius:20px;font-size:11px}
 .actions{display:flex;gap:6px;flex-wrap:wrap}
 .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .section{display:none}
 .section.active{display:block}
-.empty{text-align:center;padding:25px;color:var(--muted)}
+.empty{text-align:center;padding:25px;color:#aaa}
+hr{border:0;border-top:1px solid #333;margin:18px 0}
 @media(max-width:850px){
-.sidebar{width:190px}
-.main{margin-right:190px;padding:17px}
-.stats{grid-template-columns:repeat(2,1fr)}
-.cols{grid-template-columns:1fr}
+ .sidebar{width:190px}
+ .main{margin-right:190px;padding:17px}
+ .stats{grid-template-columns:repeat(2,1fr)}
+ .cols{grid-template-columns:1fr}
 }
 @media(max-width:600px){
-.sidebar{position:relative;width:100%;height:auto;padding:12px}
-.sidebrand{padding:4px 8px 10px}
-.sidebrand small{display:inline;margin-right:8px}
-.navlist{display:flex;overflow:auto;gap:5px}
-.navbtn{white-space:nowrap;width:auto;padding:9px 12px;margin:0;font-size:12px}
-.main{margin:0;padding:13px}
-.topbar h1{font-size:19px}
-.formgrid{grid-template-columns:1fr}
-.stats{gap:9px}
-.card{padding:13px}
-.statnum{font-size:22px}
+ .sidebar{position:relative;width:100%;height:auto;padding:12px}
+ .sidebrand{padding:4px 8px 12px;margin-bottom:10px}
+ .sidebrand small{display:inline;margin-right:8px}
+ .navlist{display:flex;overflow-x:auto;gap:5px}
+ .navbtn{white-space:nowrap;width:auto;padding:10px;margin:0;font-size:12px}
+ .main{margin:0;padding:13px}
+ .topbar h1{font-size:19px}
+ .formgrid{grid-template-columns:1fr}
+ .stats{gap:9px}
+ .card{padding:13px}
+ .statnum{font-size:22px}
 }
 </style>
 </head>
 <body>
 
+<!-- تسجيل الدخول -->
 <div class="login" id="login">
-<form class="login-card" id="loginForm">
-<div class="brand">RAI</div>
-<div class="sub">لوحة إدارة متجر راي</div>
-<label>اسم المستخدم</label>
-<input class="field" name="username" required autocomplete="username" placeholder="اسم المستخدم">
-<label>كلمة المرور</label>
-<input class="field" type="password" name="password" required autocomplete="current-password" placeholder="كلمة المرور">
-<button class="btn" style="width:100%">تسجيل الدخول</button>
-<p id="loginError" style="color:#c22;font-size:12px"></p>
-<p class="hint">بيانات الدخول الافتراضية: <b>raiadmin</b> / <b>Rai@2026</b></p>
-</form>
+ <form class="login-card" id="loginForm">
+  <div class="brand">RAI</div>
+  <div class="sub">لوحة إدارة متجر راي</div>
+
+  <label>اسم المستخدم</label>
+  <input class="field" name="username" required autocomplete="username" placeholder="اسم المستخدم">
+
+  <label>كلمة المرور</label>
+  <input class="field" type="password" name="password" required autocomplete="current-password" placeholder="كلمة المرور">
+
+  <button class="btn" style="width:100%">تسجيل الدخول</button>
+  <p id="loginError" style="color:#ff6570;font-size:12px"></p>
+  <p class="hint">بيانات الدخول الافتراضية: <b>asd</b> / <b>asd700069</b></p>
+ </form>
 </div>
 
+<!-- لوحة التحكم -->
 <div class="app" id="app">
-<aside class="sidebar">
-<div class="sidebrand">RAI <small>لوحة التحكم</small></div>
-<div class="navlist">
-<button class="navbtn active" data-page="dashboard">▦ الرئيسية</button>
-<button class="navbtn" data-page="orders">🧾 الطلبات</button>
-<button class="navbtn" data-page="products">📦 المنتجات</button>
-<button class="navbtn" data-page="categories">▤ الأقسام</button>
-<button class="navbtn" data-page="messages">✉ الشكاوى والرسائل</button>
-<button class="navbtn" data-page="settings">⚙ الإعدادات</button>
-<button class="navbtn" id="logout">↪ تسجيل الخروج</button>
-</div>
-</aside>
+ <aside class="sidebar">
+  <div class="sidebrand">RAI <small>لوحة التحكم والإدارة</small></div>
+  <div class="navlist">
+   <button class="navbtn active" data-page="dashboard">▦ الرئيسية</button>
+   <button class="navbtn" data-page="orders">🧾 الطلبات</button>
+   <button class="navbtn" data-page="products">📦 المنتجات</button>
+   <button class="navbtn" data-page="categories">▤ الأقسام</button>
+   <button class="navbtn" data-page="messages">✉ الشكاوى والرسائل</button>
+   <button class="navbtn" data-page="settings">⚙ الإعدادات</button>
+   <button class="navbtn" id="logout">↪ تسجيل الخروج</button>
+  </div>
+ </aside>
 
-<main class="main">
-<div class="topbar">
-<div>
-<h1 id="pageTitle">الرئيسية</h1>
-<div class="muted">مرحباً بك في إدارة متجر RAI</div>
-</div>
-<span class="tag" id="today"></span>
-</div>
+ <main class="main">
+  <div class="topbar">
+   <div>
+    <h1 id="pageTitle">الرئيسية</h1>
+    <div class="muted">مرحباً بك في إدارة متجر RAI</div>
+   </div>
+   <span class="tag" id="today"></span>
+  </div>
 
-<section class="section active" id="dashboard">
-<div class="stats">
-<div class="card">إجمالي الطلبات<div class="statnum" id="sOrders">0</div></div>
-<div class="card">المنتجات<div class="statnum" id="sProducts">0</div></div>
-<div class="card">الرسائل<div class="statnum" id="sMessages">0</div></div>
-<div class="card">قيمة الطلبات<div class="statnum" id="sSales">0</div><small class="muted">ريال سعودي</small></div>
-</div>
-<div class="cols">
-<div class="box">
-<h3>أحدث الطلبات</h3>
-<div id="recentOrders"></div>
-</div>
-<div class="box">
-<h3>ملخص المتجر</h3>
-<p class="muted">يمكنك إدارة المنتجات والأقسام ومراجعة الطلبات والرسائل من القائمة.</p>
-<div class="tag">وضع التخزين المحلي</div>
-<p class="hint">البيانات التي تظهر هنا محفوظة في المتصفح الحالي فقط.</p>
-</div>
-</div>
-</section>
+  <section class="section active" id="dashboard">
+   <div class="stats">
+    <div class="card">إجمالي الطلبات<div class="statnum" id="sOrders">0</div></div>
+    <div class="card">المنتجات<div class="statnum" id="sProducts">0</div></div>
+    <div class="card">الرسائل<div class="statnum" id="sMessages">0</div></div>
+    <div class="card">قيمة الطلبات<div class="statnum" id="sSales">0</div><small class="muted">ريال سعودي</small></div>
+   </div>
+   <div class="cols">
+    <div class="box">
+     <h3>أحدث الطلبات</h3>
+     <div id="recentOrders"></div>
+    </div>
+    <div class="box">
+     <h3>ملخص المتجر</h3>
+     <p class="muted">من هنا يمكنك إدارة منتجاتك وأقسامك وطلباتك.</p>
+     <span class="tag">لوحة إدارة RAI</span>
+     <p class="hint">التخزين محلي في المتصفح الحالي.</p>
+    </div>
+   </div>
+  </section>
 
-<section class="section" id="orders">
-<div class="box"><h3>إدارة الطلبات</h3><div id="ordersTable"></div></div>
-</section>
+  <section class="section" id="orders">
+   <div class="box"><h3>إدارة الطلبات</h3><div id="ordersTable"></div></div>
+  </section>
 
-<section class="section" id="products">
-<div class="cols">
-<div class="box">
-<h3 id="productFormTitle">إضافة منتج</h3>
-<form id="productForm">
-<input type="hidden" name="id">
-<label>اسم المنتج</label>
-<input class="field" name="name" required>
-<div class="formgrid">
-<div><label>السعر (ر.س)</label><input class="field" type="number" min="0" name="price" required></div>
-<div><label>القسم</label><select class="field" name="category" id="productCategory"></select></div>
-</div>
-<div class="formgrid">
-<div><label>رمز تعبيري للصورة</label><input class="field" name="emoji" placeholder="🎁" maxlength="5"></div>
-<div><label>وصف مختصر</label><input class="field" name="desc"></div>
-</div>
-<button class="btn">حفظ المنتج</button>
-<button class="btn soft" type="button" onclick="resetProduct()">إلغاء</button>
-</form>
-</div>
-<div class="box"><h3>المنتجات الحالية</h3><div id="productsTable"></div></div>
-</div>
-</section>
+  <section class="section" id="products">
+   <div class="cols">
+    <div class="box">
+     <h3 id="productFormTitle">إضافة منتج</h3>
+     <form id="productForm">
+      <input type="hidden" name="id">
+      <label>اسم المنتج</label>
+      <input class="field" name="name" required>
+      <div class="formgrid">
+       <div>
+        <label>السعر (ريال سعودي)</label>
+        <input class="field" type="number" min="0" name="price" required>
+       </div>
+       <div>
+        <label>القسم</label>
+        <select class="field" name="category" id="productCategory"></select>
+       </div>
+      </div>
+      <div class="formgrid">
+       <div>
+        <label>رمز تعبيري</label>
+        <input class="field" name="emoji" placeholder="🎁" maxlength="5">
+       </div>
+       <div>
+        <label>وصف مختصر</label>
+        <input class="field" name="desc">
+       </div>
+      </div>
+      <button class="btn">حفظ المنتج</button>
+      <button class="btn soft" type="button" onclick="resetProduct()">إلغاء</button>
+     </form>
+    </div>
+    <div class="box"><h3>المنتجات الحالية</h3><div id="productsTable"></div></div>
+   </div>
+  </section>
 
-<section class="section" id="categories">
-<div class="box">
-<h3>إدارة الأقسام</h3>
-<form id="categoryForm" style="display:flex;gap:8px;flex-wrap:wrap">
-<input class="field" style="flex:1;min-width:180px" name="category" placeholder="اسم القسم الجديد" required>
-<button class="btn">إضافة قسم</button>
-</form>
-<div id="categoriesList"></div>
-</div>
-</section>
+  <section class="section" id="categories">
+   <div class="box">
+    <h3>إدارة الأقسام</h3>
+    <form id="categoryForm" style="display:flex;gap:8px;flex-wrap:wrap">
+     <input class="field" style="flex:1;min-width:180px" name="category" placeholder="اسم القسم الجديد" required>
+     <button class="btn">إضافة قسم</button>
+    </form>
+    <div id="categoriesList"></div>
+   </div>
+  </section>
 
-<section class="section" id="messages">
-<div class="box"><h3>الشكاوى والرسائل</h3><div id="messagesList"></div></div>
-</section>
+  <section class="section" id="messages">
+   <div class="box"><h3>الشكاوى والرسائل</h3><div id="messagesList"></div></div>
+  </section>
 
-<section class="section" id="settings">
-<div class="cols">
-<div class="box">
-<h3>بيانات المتجر</h3>
-<form id="storeForm">
-<label>اسم المتجر</label><input class="field" name="name">
-<label>رقم التواصل</label><input class="field" name="phone">
-<label>البريد الإلكتروني</label><input class="field" name="email">
-<button class="btn">حفظ بيانات المتجر</button>
-</form>
-</div>
-<div class="box">
-<h3>تغيير بيانات الدخول</h3>
-<form id="authForm">
-<label>اسم المستخدم الجديد</label><input class="field" name="username" required>
-<label>كلمة المرور الجديدة</label><input class="field" name="password" type="password" required minlength="6">
-<button class="btn">حفظ بيانات الدخول</button>
-<p class="hint">يتم حفظ بيانات الدخول في المتصفح الحالي. هذه حماية شكلية وليست نظام مصادقة آمناً على الإنترنت.</p>
-</form>
-</div>
-</div>
-</section>
-</main>
+  <section class="section" id="settings">
+   <div class="cols">
+    <div class="box">
+     <h3>بيانات المتجر</h3>
+     <form id="storeForm">
+      <label>اسم المتجر</label>
+      <input class="field" name="name">
+      <label>رقم التواصل</label>
+      <input class="field" name="phone">
+      <label>البريد الإلكتروني</label>
+      <input class="field" name="email">
+      <button class="btn">حفظ بيانات المتجر</button>
+     </form>
+    </div>
+
+    <div class="box">
+     <h3>تغيير اسم المستخدم وكلمة المرور</h3>
+     <form id="authForm">
+      <label>اسم المستخدم الجديد</label>
+      <input class="field" name="username" required>
+      <label>كلمة المرور الجديدة</label>
+      <input class="field" name="password" type="password" required minlength="6">
+      <button class="btn">حفظ بيانات الدخول</button>
+      <p class="hint">بعد الحفظ استخدم بيانات الدخول الجديدة في المرة القادمة.</p>
+     </form>
+    </div>
+   </div>
+  </section>
+ </main>
 </div>
 
 <script>
@@ -200,261 +269,391 @@ const DATA='rai_store_data_v1';
 const AUTH='rai_admin_auth';
 const SET='rai_store_settings';
 
+/* تهيئة بيانات الدخول الافتراضية مرة واحدة */
+if(!localStorage.getItem('rai_auth_v3_initialized')){
+ localStorage.setItem(AUTH,JSON.stringify({
+  username:'asd',
+  password:'asd700069'
+ }));
+ localStorage.setItem('rai_auth_v3_initialized','yes');
+}
+
 const base={
-categories:['الكل','العطور','الإكسسوارات','الحقائب','الأزياء','العروض'],
-products:[
-{id:1,name:'عطر راقٍ',category:'العطور',price:120,emoji:'🌸',desc:'رائحة أنيقة تدوم طويلاً'},
-{id:2,name:'حقيبة أنيقة',category:'الحقائب',price:180,emoji:'👜',desc:'تصميم عملي وأنيق'},
-{id:3,name:'إكسسوار مميز',category:'الإكسسوارات',price:65,emoji:'✨',desc:'لمسة تكمل إطلالتك'},
-{id:4,name:'ساعة كلاسيكية',category:'الإكسسوارات',price:210,emoji:'⌚',desc:'أناقة في كل وقت'}
-],
-orders:[],
-messages:[]
+ categories:['الكل','العطور','الإكسسوارات','الحقائب','الأزياء','العروض'],
+ products:[
+  {id:1,name:'عطر راقٍ',category:'العطور',price:120,emoji:'🌸',desc:'رائحة أنيقة تدوم طويلاً'},
+  {id:2,name:'حقيبة أنيقة',category:'الحقائب',price:180,emoji:'👜',desc:'تصميم عملي وأنيق'},
+  {id:3,name:'إكسسوار مميز',category:'الإكسسوارات',price:65,emoji:'✨',desc:'لمسة تكمل إطلالتك'},
+  {id:4,name:'ساعة كلاسيكية',category:'الإكسسوارات',price:210,emoji:'⌚',desc:'أناقة في كل وقت'}
+ ],
+ orders:[],
+ messages:[]
 };
 
 const read=()=>{
-try{return {...base,...JSON.parse(localStorage.getItem(DATA)||'{}')}}
-catch{return JSON.parse(JSON.stringify(base))}
+ try{
+  const saved=JSON.parse(localStorage.getItem(DATA)||'{}');
+  return {
+   ...base,...saved,
+   categories:Array.isArray(saved.categories)?saved.categories:base.categories,
+   products:Array.isArray(saved.products)?saved.products:base.products,
+   orders:Array.isArray(saved.orders)?saved.orders:[],
+   messages:Array.isArray(saved.messages)?saved.messages:[]
+  };
+ }catch{
+  return JSON.parse(JSON.stringify(base));
+ }
 };
 
 const save=d=>localStorage.setItem(DATA,JSON.stringify(d));
 
 const getAuth=()=>{
-try{return JSON.parse(localStorage.getItem(AUTH)||'{"username":"raiadmin","password":"Rai@2026"}')}
-catch{return {username:'raiadmin',password:'Rai@2026'}}
+ try{
+  return JSON.parse(localStorage.getItem(AUTH))||{
+   username:'asd',password:'asd700069'
+  };
+ }catch{
+  return {username:'asd',password:'asd700069'};
+ }
 };
 
 const getSet=()=>{
-try{return JSON.parse(localStorage.getItem(SET)||'{}')}
-catch{return {}}
+ try{return JSON.parse(localStorage.getItem(SET)||'{}')}
+ catch{return {}}
 };
 
 const money=n=>Number(n||0).toLocaleString('ar-SA');
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
-'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+ '&':'&amp;',
+ '<':'&lt;',
+ '>':'&gt;',
+ '"':'&quot;',
+ "'":'&#39;'
 }[c]));
 
 let d=read();
 
-document.getElementById('today').textContent=new Date().toLocaleDateString('ar-SA');
+document.getElementById('today').textContent=
+ new Date().toLocaleDateString('ar-SA');
 
+/* تسجيل الدخول */
 document.getElementById('loginForm').addEventListener('submit',e=>{
-e.preventDefault();
-let f=Object.fromEntries(new FormData(e.target));
-let a=getAuth();
+ e.preventDefault();
 
-if(f.username===a.username&&f.password===a.password){
-sessionStorage.setItem('rai_admin_logged','yes');
-openApp();
-}else{
-document.getElementById('loginError').textContent='اسم المستخدم أو كلمة المرور غير صحيحة.';
-}
+ const f=Object.fromEntries(new FormData(e.target));
+ const a=getAuth();
+
+ if(f.username===a.username && f.password===a.password){
+  sessionStorage.setItem('rai_admin_logged','yes');
+  document.getElementById('loginError').textContent='';
+  openApp();
+ }else{
+  document.getElementById('loginError').textContent=
+   'اسم المستخدم أو كلمة المرور غير صحيحة.';
+ }
 });
 
 function openApp(){
-document.getElementById('login').style.display='none';
-document.getElementById('app').style.display='block';
-renderAll();
+ document.getElementById('login').style.display='none';
+ document.getElementById('app').style.display='block';
+ renderAll();
 }
 
-if(sessionStorage.getItem('rai_admin_logged')==='yes')openApp();
+if(sessionStorage.getItem('rai_admin_logged')==='yes'){
+ openApp();
+}
 
 document.getElementById('logout').onclick=()=>{
-sessionStorage.removeItem('rai_admin_logged');
-location.reload();
+ sessionStorage.removeItem('rai_admin_logged');
+ location.reload();
 };
 
+/* التنقل بين الصفحات */
 document.querySelectorAll('.navbtn[data-page]').forEach(b=>{
-b.onclick=()=>showPage(b.dataset.page);
+ b.onclick=()=>showPage(b.dataset.page);
 });
 
 function showPage(id){
-document.querySelectorAll('.section').forEach(x=>x.classList.toggle('active',x.id===id));
-document.querySelectorAll('.navbtn[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===id));
-document.getElementById('pageTitle').textContent=({
-dashboard:'الرئيسية',
-orders:'الطلبات',
-products:'المنتجات',
-categories:'الأقسام',
-messages:'الشكاوى والرسائل',
-settings:'الإعدادات'
-})[id];
-renderAll();
+ document.querySelectorAll('.section').forEach(x=>{
+  x.classList.toggle('active',x.id===id);
+ });
+
+ document.querySelectorAll('.navbtn[data-page]').forEach(x=>{
+  x.classList.toggle('active',x.dataset.page===id);
+ });
+
+ document.getElementById('pageTitle').textContent=({
+  dashboard:'الرئيسية',
+  orders:'الطلبات',
+  products:'المنتجات',
+  categories:'الأقسام',
+  messages:'الشكاوى والرسائل',
+  settings:'الإعدادات'
+ })[id];
+
+ renderAll();
 }
 
+/* تحديث لوحة التحكم */
 function renderAll(){
-d=read();
+ d=read();
 
-document.getElementById('sOrders').textContent=d.orders.length;
-document.getElementById('sProducts').textContent=d.products.length;
-document.getElementById('sMessages').textContent=d.messages.length;
-document.getElementById('sSales').textContent=money(d.orders.reduce((s,o)=>s+Number(o.total||0),0));
+ document.getElementById('sOrders').textContent=d.orders.length;
+ document.getElementById('sProducts').textContent=d.products.length;
+ document.getElementById('sMessages').textContent=d.messages.length;
 
-document.getElementById('recentOrders').innerHTML=tableOrders(d.orders.slice(0,5));
-document.getElementById('ordersTable').innerHTML=tableOrders(d.orders);
-document.getElementById('productsTable').innerHTML=tableProducts();
+ document.getElementById('sSales').textContent=
+  money(d.orders.reduce((s,o)=>s+Number(o.total||0),0));
 
-document.getElementById('categoriesList').innerHTML=
-d.categories.filter(c=>c!=='الكل').map(c=>
-`<div style="display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #f4e7ec">${esc(c)} <button class="btn danger" onclick="delCat('${esc(c)}')">حذف</button></div>`
-).join('')||'<div class="empty">لا توجد أقسام</div>';
+ document.getElementById('recentOrders').innerHTML=
+  tableOrders(d.orders.slice(0,5));
 
-document.getElementById('messagesList').innerHTML=
-d.messages.map(m=>
-`<div style="padding:14px;border-bottom:1px solid #f4e7ec"><b>${esc(m.name)}</b> — ${esc(m.phone)} <small class="muted">${esc(m.date)}</small><p>${esc(m.message)}</p></div>`
-).join('')||'<div class="empty">لا توجد رسائل حتى الآن</div>';
+ document.getElementById('ordersTable').innerHTML=
+  tableOrders(d.orders);
 
-document.getElementById('productCategory').innerHTML=
-d.categories.filter(c=>c!=='الكل').map(c=>`<option>${esc(c)}</option>`).join('');
+ document.getElementById('productsTable').innerHTML=
+  tableProducts();
 
-let s=getSet();
-let sf=document.getElementById('storeForm');
-sf.name.value=s.name||'RAI';
-sf.phone.value=s.phone||'';
-sf.email.value=s.email||'';
+ document.getElementById('categoriesList').innerHTML=
+  d.categories.filter(c=>c!=='الكل').map(c=>
+   `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #383838">
+    ${esc(c)}
+    <button class="btn danger" onclick="delCat('${esc(c)}')">حذف</button>
+   </div>`
+  ).join('')||'<div class="empty">لا توجد أقسام</div>';
 
-let a=getAuth();
-document.getElementById('authForm').username.value=a.username;
+ document.getElementById('messagesList').innerHTML=
+  d.messages.map(m=>
+   `<div style="padding:14px;border-bottom:1px solid #383838">
+    <b>${esc(m.name)}</b> — ${esc(m.phone)}
+    <small class="muted">${esc(m.date)}</small>
+    <p>${esc(m.message)}</p>
+   </div>`
+  ).join('')||'<div class="empty">لا توجد رسائل حتى الآن</div>';
+
+ document.getElementById('productCategory').innerHTML=
+  d.categories.filter(c=>c!=='الكل').map(c=>
+   `<option>${esc(c)}</option>`
+  ).join('');
+
+ const s=getSet();
+ const sf=document.getElementById('storeForm');
+ sf.elements.name.value=s.name||'RAI';
+ sf.elements.phone.value=s.phone||'';
+ sf.elements.email.value=s.email||'';
+
+ document.getElementById('authForm').elements.username.value=
+  getAuth().username;
 }
 
+/* جدول الطلبات */
 function tableOrders(arr){
-if(!arr.length)return '<div class="empty">لا توجد طلبات حتى الآن. ستظهر الطلبات المحفوظة في هذا المتصفح هنا.</div>';
+ if(!arr.length){
+  return '<div class="empty">لا توجد طلبات محفوظة في هذا المتصفح.</div>';
+ }
 
-return `<div class="tablewrap"><table>
-<thead><tr><th>رقم الطلب</th><th>العميل</th><th>الجوال</th><th>الإجمالي</th><th>الحالة</th><th>إجراء</th></tr></thead>
-<tbody>${arr.map(o=>
-`<tr>
-<td>${esc(o.id)}</td>
-<td>${esc(o.name)}</td>
-<td>${esc(o.phone)}</td>
-<td>${money(o.total)} ر.س</td>
-<td><span class="tag">${esc(o.status||'جديد')}</span></td>
-<td><div class="actions">
-<button class="btn soft" onclick="viewOrder('${esc(o.id)}')">تفاصيل</button>
-<button class="btn danger" onclick="delOrder('${esc(o.id)}')">حذف</button>
-</div></td>
-</tr>`
-).join('')}</tbody></table></div>`;
+ return `<div class="tablewrap">
+ <table>
+ <thead>
+ <tr>
+  <th>رقم الطلب</th><th>العميل</th><th>الجوال</th>
+  <th>الإجمالي</th><th>الحالة</th><th>إجراء</th>
+ </tr>
+ </thead>
+ <tbody>
+ ${arr.map(o=>
+ `<tr>
+  <td>${esc(o.id)}</td>
+  <td>${esc(o.name)}</td>
+  <td>${esc(o.phone)}</td>
+  <td>${money(o.total)} ر.س</td>
+  <td><span class="tag">${esc(o.status||'جديد')}</span></td>
+  <td>
+   <div class="actions">
+    <button class="btn soft" onclick="viewOrder('${esc(o.id)}')">تفاصيل</button>
+    <button class="btn danger" onclick="delOrder('${esc(o.id)}')">حذف</button>
+   </div>
+  </td>
+ </tr>`
+ ).join('')}
+ </tbody>
+ </table>
+ </div>`;
 }
 
+/* جدول المنتجات */
 function tableProducts(){
-if(!d.products.length)return '<div class="empty">لا توجد منتجات</div>';
+ if(!d.products.length){
+  return '<div class="empty">لا توجد منتجات</div>';
+ }
 
-return `<div class="tablewrap"><table>
-<thead><tr><th>المنتج</th><th>القسم</th><th>السعر</th><th>إجراء</th></tr></thead>
-<tbody>${d.products.map(p=>
-`<tr>
-<td>${p.emoji||'🎁'} ${esc(p.name)}</td>
-<td>${esc(p.category)}</td>
-<td>${money(p.price)} ر.س</td>
-<td><div class="actions">
-<button class="btn soft" onclick="editProduct(${p.id})">تعديل</button>
-<button class="btn danger" onclick="delProduct(${p.id})">حذف</button>
-</div></td>
-</tr>`
-).join('')}</tbody></table></div>`;
+ return `<div class="tablewrap">
+ <table>
+ <thead>
+ <tr><th>المنتج</th><th>القسم</th><th>السعر</th><th>إجراء</th></tr>
+ </thead>
+ <tbody>
+ ${d.products.map(p=>
+ `<tr>
+  <td>${esc(p.emoji||'🎁')} ${esc(p.name)}</td>
+  <td>${esc(p.category)}</td>
+  <td>${money(p.price)} ر.س</td>
+  <td>
+   <div class="actions">
+    <button class="btn soft" onclick="editProduct(${Number(p.id)})">تعديل</button>
+    <button class="btn danger" onclick="delProduct(${Number(p.id)})">حذف</button>
+   </div>
+  </td>
+ </tr>`
+ ).join('')}
+ </tbody>
+ </table>
+ </div>`;
 }
 
+/* تفاصيل الطلب */
 function viewOrder(id){
-let o=d.orders.find(x=>x.id===id);
-if(o)alert(
-'رقم الطلب: '+o.id+
-'\nالعميل: '+o.name+
-'\nالجوال: '+o.phone+
-'\nالمدينة: '+o.city+
-'\nالعنوان: '+o.address+
-'\nالمنتجات: '+(o.items||[]).map(i=>i.name).join('، ')+
-'\nالإجمالي: '+money(o.total)+' ر.س'+
-'\nملاحظات: '+(o.notes||'')
-);
+ const o=d.orders.find(x=>String(x.id)===String(id));
+ if(!o)return;
+
+ alert(
+  'رقم الطلب: '+o.id+
+  '\nالعميل: '+(o.name||'')+
+  '\nالجوال: '+(o.phone||'')+
+  '\nالمدينة: '+(o.city||'')+
+  '\nالعنوان: '+(o.address||'')+
+  '\nالمنتجات: '+(o.items||[]).map(i=>i.name).join('، ')+
+  '\nالإجمالي: '+money(o.total)+' ر.س'+
+  '\nملاحظات: '+(o.notes||'')
+ );
 }
 
 function delOrder(id){
-if(confirm('حذف هذا الطلب؟')){
-d.orders=d.orders.filter(o=>o.id!==id);
-save(d);
-renderAll();
-}
+ if(confirm('هل تريد حذف هذا الطلب؟')){
+  d.orders=d.orders.filter(o=>String(o.id)!==String(id));
+  save(d);
+  renderAll();
+ }
 }
 
+/* المنتجات */
 function delProduct(id){
-if(confirm('حذف المنتج؟')){
-d.products=d.products.filter(p=>p.id!==id);
-save(d);
-renderAll();
-}
+ if(confirm('هل تريد حذف هذا المنتج؟')){
+  d.products=d.products.filter(p=>Number(p.id)!==Number(id));
+  save(d);
+  renderAll();
+ }
 }
 
 function editProduct(id){
-let p=d.products.find(x=>x.id===id);
-if(!p)return;
-let f=document.getElementById('productForm');
-Object.keys(p).forEach(k=>{if(f.elements[k])f.elements[k].value=p[k]});
-document.getElementById('productFormTitle').textContent='تعديل المنتج';
-showPage('products');
+ const p=d.products.find(x=>Number(x.id)===Number(id));
+ if(!p)return;
+
+ showPage('products');
+
+ const f=document.getElementById('productForm');
+ Object.keys(p).forEach(k=>{
+  if(f.elements[k])f.elements[k].value=p[k];
+ });
+
+ document.getElementById('productFormTitle').textContent='تعديل المنتج';
 }
 
 function resetProduct(){
-document.getElementById('productForm').reset();
-document.querySelector('#productForm [name=id]').value='';
-document.getElementById('productFormTitle').textContent='إضافة منتج';
+ document.getElementById('productForm').reset();
+ document.querySelector('#productForm [name=id]').value='';
+ document.getElementById('productFormTitle').textContent='إضافة منتج';
 }
 
 document.getElementById('productForm').onsubmit=e=>{
-e.preventDefault();
-let f=Object.fromEntries(new FormData(e.target));
-let id=Number(f.id);
-let p={
-id:id||Date.now(),
-name:f.name,
-price:Number(f.price),
-category:f.category,
-emoji:f.emoji||'🎁',
-desc:f.desc||''
-};
-if(id)d.products=d.products.map(x=>x.id===id?p:x);
-else d.products.unshift(p);
-save(d);
-resetProduct();
-renderAll();
-alert('تم حفظ المنتج');
+ e.preventDefault();
+
+ const f=Object.fromEntries(new FormData(e.target));
+ const id=Number(f.id);
+
+ const p={
+  id:id||Date.now(),
+  name:f.name,
+  price:Number(f.price),
+  category:f.category,
+  emoji:f.emoji||'🎁',
+  desc:f.desc||''
+ };
+
+ if(id){
+  d.products=d.products.map(x=>Number(x.id)===id?p:x);
+ }else{
+  d.products.unshift(p);
+ }
+
+ save(d);
+ resetProduct();
+ renderAll();
+ alert('تم حفظ المنتج بنجاح');
 };
 
+/* الأقسام */
 document.getElementById('categoryForm').onsubmit=e=>{
-e.preventDefault();
-let c=new FormData(e.target).get('category').trim();
-if(c&&!d.categories.includes(c)){
-d.categories.push(c);
-save(d);
-renderAll();
-}
-e.target.reset();
+ e.preventDefault();
+
+ const c=new FormData(e.target).get('category').trim();
+
+ if(c && !d.categories.includes(c)){
+  d.categories.push(c);
+  save(d);
+  renderAll();
+ }else if(d.categories.includes(c)){
+  alert('هذا القسم موجود بالفعل');
+ }
+
+ e.target.reset();
 };
 
 function delCat(c){
-if(!confirm('حذف القسم؟'))return;
-if(d.products.some(p=>p.category===c)){
-alert('لا يمكن حذف القسم لأنه يحتوي على منتجات. انقل المنتجات أولاً.');
-return;
-}
-d.categories=d.categories.filter(x=>x!==c);
-save(d);
-renderAll();
+ if(!confirm('هل تريد حذف هذا القسم؟'))return;
+
+ if(d.products.some(p=>p.category===c)){
+  alert('لا يمكن حذف القسم لأنه يحتوي على منتجات. انقل المنتجات أولاً.');
+  return;
+ }
+
+ d.categories=d.categories.filter(x=>x!==c);
+ save(d);
+ renderAll();
 }
 
+/* بيانات المتجر */
 document.getElementById('storeForm').onsubmit=e=>{
-e.preventDefault();
-let s=Object.fromEntries(new FormData(e.target));
-localStorage.setItem(SET,JSON.stringify(s));
-alert('تم حفظ بيانات المتجر في هذا المتصفح.');
+ e.preventDefault();
+
+ const s=Object.fromEntries(new FormData(e.target));
+ localStorage.setItem(SET,JSON.stringify(s));
+
+ alert('تم حفظ بيانات المتجر في هذا المتصفح.');
 };
 
+/* تغيير اسم المستخدم وكلمة المرور */
 document.getElementById('authForm').onsubmit=e=>{
-e.preventDefault();
-let a=Object.fromEntries(new FormData(e.target));
-localStorage.setItem(AUTH,JSON.stringify(a));
-alert('تم تحديث بيانات الدخول. استخدمها في المرة القادمة.');
+ e.preventDefault();
+
+ const a=Object.fromEntries(new FormData(e.target));
+
+ if(!a.username.trim()||!a.password){
+  alert('يرجى إدخال اسم المستخدم وكلمة المرور');
+  return;
+ }
+
+ localStorage.setItem(AUTH,JSON.stringify({
+  username:a.username.trim(),
+  password:a.password
+ }));
+
+ sessionStorage.removeItem('rai_admin_logged');
+
+ alert('تم تغيير بيانات الدخول. سجّل الدخول مرة أخرى بالبيانات الجديدة.');
+
+ location.reload();
 };
 </script>
 </body>
