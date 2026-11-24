@@ -1,0 +1,8 @@
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: DENY
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+تنبيه:
+هذه الرؤوس تُضاف من Cloudflare Response Header Transform Rules بعد ربط نطاق مخصص.
+لا تستخدم Content-Security-Policy صارمة قبل إزالة السكربتات المضمنة وسمات onclick من صفحات RAI واختبار سياسة CSP.
