@@ -20,7 +20,7 @@
 </main>
 <nav class="bottom"><button class="nav active" data-p="home" onclick="go('home')"><i>⌂</i>الرئيسية</button><button class="nav" data-p="categories" onclick="go('categories')"><i>▦</i>الأقسام</button><button class="nav" data-p="cart" onclick="go('cart')"><i>🛒</i>السلة</button><button class="nav" data-p="favorites" onclick="go('favorites')"><i>♡</i>المفضلة</button><button class="nav" data-p="account" onclick="go('account')"><i>♙</i>حسابي</button></nav><div id="toast" class="toast"></div>
 <script>
-// 1. تصفير جميع البيانات الافتراضية (متجر جديد)
+// 1. تصفير جميع البيانات (متجر جديد)
 const defaultData = {
     categories: ['الكل'],
     products: []
@@ -60,8 +60,6 @@ function getNextOrderNumber() {
     try {
         let currentData = JSON.parse(localStorage.getItem('rai_store_data_v1') || '{}');
         let orders = currentData.orders || [];
-        
-        // البحث عن أعلى رقم طلب موجود
         let maxId = 0;
         orders.forEach(o => {
             let num = parseInt(o.id || o.orderNumber);
@@ -69,21 +67,20 @@ function getNextOrderNumber() {
                 maxId = num;
             }
         });
-        
-        return maxId + 1; // إرجاع الرقم التالي
+        return maxId + 1; // الرقم التالي
     } catch(e) {
-        return 1; // إذا كانت الذاكرة فارغة تماماً، يبدأ من 1
+        return 1; // يبدأ من 1 إذا كان فارغاً
     }
 }
 
-// 3. دالة حفظ الطلب في لوحة التحكم بالرقم التسلسلي
+// 3. حفظ الطلب في لوحة التحكم
 function saveOrderToDashboard(order) {
     try {
         let currentData = JSON.parse(localStorage.getItem('rai_store_data_v1') || '{}');
         if (!currentData.orders) currentData.orders = [];
         
         const adminOrder = {
-            id: order.orderNumber, // استخدام الرقم التسلسلي
+            id: order.orderNumber,
             name: order.customer.name,
             phone: order.customer.phone,
             city: order.customer.city,
@@ -99,7 +96,6 @@ function saveOrderToDashboard(order) {
     } catch(e) { console.error("خطأ في حفظ الطلب", e); }
 }
 
-// 4. تصفير السلة والمفضلة عند بدء التشغيل لأول مرة
 let cart=JSON.parse(localStorage.getItem('rai_cart')||'[]'),favs=JSON.parse(localStorage.getItem('rai_favs')||'[]'),orders=JSON.parse(localStorage.getItem('rai_orders')||'[]'),filter='';
 const money=n=>Number(n).toLocaleString('en-US')+'﷼';
 function save(){localStorage.setItem('rai_cart',JSON.stringify(cart));localStorage.setItem('rai_favs',JSON.stringify(favs));localStorage.setItem('rai_orders',JSON.stringify(orders));document.getElementById('count').textContent=cart.reduce((a,x)=>a+x.qty,0)}
@@ -143,18 +139,18 @@ function drawCart(){
 
 function drawSummary(){checkoutsummary.innerHTML=cart.map(x=>`<div class="line"><span>${x.name} × ${x.qty}</span><b>${money(x.price*x.qty)}</b></div>`).join('')+`<div class="line"><span>الشحن</span><b>${money(ship())}</b></div><div class="line total"><span>الإجمالي</span><b>${money(sub()+ship())}</b></div>`}
 
-// 5. تعديل إرسال الطلب ليأخذ الرقم التسلسلي
+// 4. إرسال الطلب بالرقم التسلسلي
 checkoutform.addEventListener('submit',e=>{
     e.preventDefault();
     if(!cart.length){msg('السلة فارغة');go('cart');return}
     let f=new FormData(e.target),d=new Date(),
         date=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
     
-    let nextOrderNum = getNextOrderNumber(); // جلب الرقم التسلسلي
+    let nextOrderNum = getNextOrderNumber(); 
     
     let o={
-        orderNumber: nextOrderNum, // رقم تسلسلي (1, 2, 3...)
-        number: '#' + nextOrderNum, // للعرض
+        orderNumber: nextOrderNum,
+        number: '#' + nextOrderNum,
         date,
         customer:{name:f.get('name'),phone:f.get('phone'),city:f.get('city'),address:f.get('address')},
         items:cart.map(x=>({...x})),
