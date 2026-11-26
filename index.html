@@ -13,25 +13,17 @@
 <section id="cart" class="page"><h1 class="title">سلة التسوق</h1><div id="cartitems" class="panel"></div><div id="carttotal" class="panel"></div></section>
 <section id="checkout" class="page"><h1 class="title">إتمام الطلب</h1><form id="checkoutform" class="panel"><h3>معلومات العميل</h3><label class="field"><span>الاسم الكامل *</span><input name="name" required></label><label class="field"><span>رقم الهاتف *</span><input name="phone" required inputmode="tel"></label><label class="field"><span>المدينة *</span><input name="city" required></label><label class="field"><span>العنوان بالتفصيل *</span><textarea name="address" required></textarea></label><h3>ملخص الطلب</h3><div id="checkoutsummary"></div><div class="panel"><b>طريقة الدفع: الدفع عند الاستلام فقط</b></div><button class="btn" style="width:100%">تأكيد الطلب ✓</button></form></section>
 <section id="invoice" class="page"><div id="invoicebody" class="panel invoice"></div></section>
-<section id="tracking" class="page"><h1 class="title">تتبع طلبك</h1><div class="panel"><label class="field"><span>رقم الطلب</span><input id="trackno" placeholder="#10025"></label><button class="btn" onclick="track()">تتبع الطلب</button></div><div id="trackresult"></div></section>
+<section id="tracking" class="page"><h1 class="title">تتبع طلبك</h1><div class="panel"><label class="field"><span>رقم الطلب</span><input id="trackno" placeholder="1"></label><button class="btn" onclick="track()">تتبع الطلب</button></div><div id="trackresult"></div></section>
 <section id="favorites" class="page"><h1 class="title">المفضلة</h1><div id="favgrid" class="grid"></div></section>
 <section id="account" class="page"><h1 class="title">حسابي الشخصي</h1><div class="panel"><h3>معلومات الحساب</h3><div id="customerinfo" class="muted">ستظهر بياناتك بعد إتمام أول طلب.</div></div><div class="panel"><h3>طلباتي</h3><div id="myorders"></div></div><button class="btn outline" onclick="go('about')">تواصل معنا</button></section>
 <section id="about" class="page"><h1 class="title">من نحن؟</h1><div class="panel"><h2>RAI متجر راي الإلكتروني</h2><p>وجهتك للتسوق الإلكتروني. نسعى لتقديم منتجات مختارة وتجربة تسوق سهلة ومريحة.</p><h3>تواصل معنا</h3><p>أضف بيانات التواصل الخاصة بمتجرك قبل النشر.</p></div></section>
 </main>
 <nav class="bottom"><button class="nav active" data-p="home" onclick="go('home')"><i>⌂</i>الرئيسية</button><button class="nav" data-p="categories" onclick="go('categories')"><i>▦</i>الأقسام</button><button class="nav" data-p="cart" onclick="go('cart')"><i>🛒</i>السلة</button><button class="nav" data-p="favorites" onclick="go('favorites')"><i>♡</i>المفضلة</button><button class="nav" data-p="account" onclick="go('account')"><i>♙</i>حسابي</button></nav><div id="toast" class="toast"></div>
 <script>
+// 1. تصفير جميع البيانات الافتراضية (متجر جديد)
 const defaultData = {
-    categories: ['الكل', 'ملابس رجالية','ملابس نسائية','ساعات','أحذية رياضية','حقائب','عطور','نظارات','إكسسوارات','عروض خاصة'],
-    products: [
-        {id:1,name:'ساعة فاخرة رجالية',cat:'ساعات',price:799,old:999,icon:'⌚',image:'',desc:'ساعة أنيقة بتصميم فاخر.'},
-        {id:2,name:'حذاء رياضي مميز',cat:'أحذية رياضية',price:279,old:399,icon:'👟',image:'',desc:'حذاء رياضي عصري وجودة عالية.'},
-        {id:3,name:'حقيبة نسائية فاخرة',cat:'حقائب',price:389,old:599,icon:'👜',image:'',desc:'حقيبة أنيقة وعملية.'},
-        {id:4,name:'عطر فاخر للرجال',cat:'عطور',price:299,old:499,icon:'🧴',image:'',desc:'عطر مميز برائحة جذابة.'},
-        {id:5,name:'بدلة رجالية أنيقة',cat:'ملابس رجالية',price:599,old:799,icon:'🤵',image:'',desc:'إطلالة كلاسيكية أنيقة.'},
-        {id:6,name:'فستان نسائي راقٍ',cat:'ملابس نسائية',price:449,old:599,icon:'👗',image:'',desc:'تصميم أنيق للمناسبات.'},
-        {id:7,name:'نظارات شمسية عصرية',cat:'نظارات',price:199,old:399,icon:'🕶️',image:'',desc:'نظارات بإطار عصري.'},
-        {id:8,name:'إكسسوار أنيق',cat:'إكسسوارات',price:99,old:149,icon:'💍',image:'',desc:'لمسة أنيقة لإطلالتك.'}
-    ]
+    categories: ['الكل'],
+    products: []
 };
 
 function getStoreData() {
@@ -58,17 +50,40 @@ let products = storeData.products.map(p => ({
     price: Number(p.price),
     old: Number(p.price) + 100,
     icon: p.emoji || p.icon || '📦',
-    image: p.image || '', // إضافة دعم الصور
+    image: p.image || '',
     desc: p.desc || p.description || ''
 }));
 let cats = storeData.categories.filter(c => c !== 'الكل').map(c => [c, '📦']);
 
+// 2. دالة توليد رقم الطلب التسلسلي (1, 2, 3...)
+function getNextOrderNumber() {
+    try {
+        let currentData = JSON.parse(localStorage.getItem('rai_store_data_v1') || '{}');
+        let orders = currentData.orders || [];
+        
+        // البحث عن أعلى رقم طلب موجود
+        let maxId = 0;
+        orders.forEach(o => {
+            let num = parseInt(o.id || o.orderNumber);
+            if (!isNaN(num) && num > maxId) {
+                maxId = num;
+            }
+        });
+        
+        return maxId + 1; // إرجاع الرقم التالي
+    } catch(e) {
+        return 1; // إذا كانت الذاكرة فارغة تماماً، يبدأ من 1
+    }
+}
+
+// 3. دالة حفظ الطلب في لوحة التحكم بالرقم التسلسلي
 function saveOrderToDashboard(order) {
     try {
         let currentData = JSON.parse(localStorage.getItem('rai_store_data_v1') || '{}');
         if (!currentData.orders) currentData.orders = [];
+        
         const adminOrder = {
-            id: order.number.replace('#', ''),
+            id: order.orderNumber, // استخدام الرقم التسلسلي
             name: order.customer.name,
             phone: order.customer.phone,
             city: order.customer.city,
@@ -78,21 +93,22 @@ function saveOrderToDashboard(order) {
             status: 'جديد',
             items: order.items.map(i => ({ name: i.name, qty: i.qty, price: i.price }))
         };
+        
         currentData.orders.push(adminOrder);
         localStorage.setItem('rai_store_data_v1', JSON.stringify(currentData));
     } catch(e) { console.error("خطأ في حفظ الطلب", e); }
 }
 
+// 4. تصفير السلة والمفضلة عند بدء التشغيل لأول مرة
 let cart=JSON.parse(localStorage.getItem('rai_cart')||'[]'),favs=JSON.parse(localStorage.getItem('rai_favs')||'[]'),orders=JSON.parse(localStorage.getItem('rai_orders')||'[]'),filter='';
 const money=n=>Number(n).toLocaleString('en-US')+'﷼';
 function save(){localStorage.setItem('rai_cart',JSON.stringify(cart));localStorage.setItem('rai_favs',JSON.stringify(favs));localStorage.setItem('rai_orders',JSON.stringify(orders));document.getElementById('count').textContent=cart.reduce((a,x)=>a+x.qty,0)}
 function msg(s){let t=document.getElementById('toast');t.textContent=s;t.style.display='block';setTimeout(()=>t.style.display='none',2000)}
 function go(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('active',x.dataset.p===id));if(id==='cart')drawCart();if(id==='favorites')drawFav();if(id==='checkout')drawSummary();if(id==='account')drawAccount();scrollTo(0,0)}
 function catHTML(c){return `<button class="cat" onclick="choose('${c[0]}')"><span>${c[1]}</span>${c[0]}</button>`}
-function drawCats(){homecats.innerHTML=cats.slice(0,6).map(catHTML).join('');allcats.innerHTML=cats.map(catHTML).join('')}
+function drawCats(){homecats.innerHTML=cats.slice(0,6).map(catHTML).join('') || '<div class="empty">لا توجد أقسام حالياً</div>';allcats.innerHTML=cats.map(catHTML).join('') || '<div class="empty">لا توجد أقسام حالياً</div>'}
 function choose(c){filter=c;document.getElementById('filter').textContent='القسم: '+c;go('products');renderProducts()}
 
-// تعديل دالة العرض لتدعم الصور
 function card(p){
     const imgHTML = p.image ? `<img src="${p.image}" alt="${p.name}">` : p.icon;
     return `<article class="product">
@@ -109,7 +125,7 @@ function card(p){
     </article>`;
 }
 
-function renderProducts(){let q=search.value.trim();let a=products.filter(p=>(!filter||p.cat===filter)&&(!q||p.name.includes(q)||p.cat.includes(q)));productgrid.innerHTML=a.length?a.map(card).join(''):'<div class="empty">لا توجد منتجات</div>';homeproducts.innerHTML=products.slice(0,3).map(card).join('')}
+function renderProducts(){let q=search.value.trim();let a=products.filter(p=>(!filter||p.cat===filter)&&(!q||p.name.includes(q)||p.cat.includes(q)));productgrid.innerHTML=a.length?a.map(card).join(''):'<div class="empty">لا توجد منتجات حالياً</div>';homeproducts.innerHTML=products.slice(0,3).map(card).join('') || '<div class="empty">لا توجد منتجات حالياً</div>'}
 function detail(id){let p=products.find(x=>x.id===id);const imgHTML = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:contain;padding:20px">` : p.icon;detailbody.innerHTML=`<div class="panel"><div class="photo" style="height:300px;font-size:120px;background:#1a1015">${imgHTML}</div><h1>${p.name}</h1><p>${p.desc}</p><div class="price">${money(p.price)}</div><label class="field"><span>الكمية</span><input id="dq" type="number" min="1" value="1"></label><button class="btn" style="width:100%" onclick="add(${p.id},+dq.value)">إضافة إلى السلة</button><button class="btn outline" style="width:100%;margin-top:9px" onclick="fav(${p.id})">♡ المفضلة</button></div>`;go('detail')}
 function add(id,n=1){let p=products.find(x=>x.id===id),x=cart.find(x=>x.id===id);n=Math.max(1,Number(n)||1);if(x)x.qty+=n;else cart.push({id:p.id,name:p.name,price:p.price,icon:p.icon,image:p.image,qty:n});save();msg('تمت إضافة المنتج إلى السلة')}
 function fav(id){favs=favs.includes(id)?favs.filter(x=>x!==id):[...favs,id];save();renderProducts();drawFav();msg('تم تحديث المفضلة')}
@@ -127,23 +143,39 @@ function drawCart(){
 
 function drawSummary(){checkoutsummary.innerHTML=cart.map(x=>`<div class="line"><span>${x.name} × ${x.qty}</span><b>${money(x.price*x.qty)}</b></div>`).join('')+`<div class="line"><span>الشحن</span><b>${money(ship())}</b></div><div class="line total"><span>الإجمالي</span><b>${money(sub()+ship())}</b></div>`}
 
+// 5. تعديل إرسال الطلب ليأخذ الرقم التسلسلي
 checkoutform.addEventListener('submit',e=>{
     e.preventDefault();
     if(!cart.length){msg('السلة فارغة');go('cart');return}
     let f=new FormData(e.target),d=new Date(),
-        date=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0'),
-        o={number:'#'+(10000+Math.floor(Math.random()*89999)),date,customer:{name:f.get('name'),phone:f.get('phone'),city:f.get('city'),address:f.get('address')},items:cart.map(x=>({...x})),subtotal:sub(),shipping:ship(),total:sub()+ship(),payment:'الدفع عند الاستلام فقط',status:'تم استلام الطلب'};
+        date=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+    
+    let nextOrderNum = getNextOrderNumber(); // جلب الرقم التسلسلي
+    
+    let o={
+        orderNumber: nextOrderNum, // رقم تسلسلي (1, 2, 3...)
+        number: '#' + nextOrderNum, // للعرض
+        date,
+        customer:{name:f.get('name'),phone:f.get('phone'),city:f.get('city'),address:f.get('address')},
+        items:cart.map(x=>({...x})),
+        subtotal:sub(),
+        shipping:ship(),
+        total:sub()+ship(),
+        payment:'الدفع عند الاستلام فقط',
+        status:'تم استلام الطلب'
+    };
+    
     saveOrderToDashboard(o);
     orders.unshift(o);cart=[];save();e.target.reset();invoice(o);
 });
 
 function invoice(o){
-    invoicebody.innerHTML=`<div style="font-size:42px;color:#43d58c">✓</div><h2>تم تأكيد طلبك بنجاح</h2><p>شكراً لتسوقك من متجر RAI</p><div class="panel"><div>رقم الطلب</div><div class="orderno">${o.number}</div><div class="line"><span>تاريخ الطلب</span><b dir="ltr">${o.date}</b></div><div class="line"><span>اسم العميل</span><b>${o.customer.name}</b></div><div class="line"><span>الهاتف</span><b dir="ltr">${o.customer.phone}</b></div></div><h3>تفاصيل الفاتورة</h3><table><tr><th>المنتج</th><th>الكمية</th><th>السعر</th></tr>${o.items.map(x=>`<tr><td>${x.name}</td><td>${x.qty}</td><td>${money(x.price*x.qty)}</td></tr>`).join('')}</table><div class="line"><span>قيمة المنتجات</span><b>${money(o.subtotal)}</b></div><div class="line"><span>الشحن</span><b>${money(o.shipping)}</b></div><div class="line total"><span>الإجمالي عند الاستلام</span><b>${money(o.total)}</b></div><div class="panel"><b>طريقة الدفع: الدفع عند الاستلام فقط</b><p class="small">احتفظ برقم الطلب لمتابعته.</p></div><button class="btn" onclick="go('home')">العودة إلى الرئيسية</button> <button class="btn outline" onclick="trackno.value='${o.number}';go('tracking');track()">تتبع الطلب</button>`;
+    invoicebody.innerHTML=`<div style="font-size:42px;color:#43d58c">✓</div><h2>تم تأكيد طلبك بنجاح</h2><p>شكراً لتسوقك من متجر RAI</p><div class="panel"><div>رقم الطلب</div><div class="orderno">#${o.orderNumber}</div><div class="line"><span>تاريخ الطلب</span><b dir="ltr">${o.date}</b></div><div class="line"><span>اسم العميل</span><b>${o.customer.name}</b></div><div class="line"><span>الهاتف</span><b dir="ltr">${o.customer.phone}</b></div></div><h3>تفاصيل الفاتورة</h3><table><tr><th>المنتج</th><th>الكمية</th><th>السعر</th></tr>${o.items.map(x=>`<tr><td>${x.name}</td><td>${x.qty}</td><td>${money(x.price*x.qty)}</td></tr>`).join('')}</table><div class="line"><span>قيمة المنتجات</span><b>${money(o.subtotal)}</b></div><div class="line"><span>الشحن</span><b>${money(o.shipping)}</b></div><div class="line total"><span>الإجمالي عند الاستلام</span><b>${money(o.total)}</b></div><div class="panel"><b>طريقة الدفع: الدفع عند الاستلام فقط</b><p class="small">احتفظ برقم الطلب لمتابعته.</p></div><button class="btn" onclick="go('home')">العودة إلى الرئيسية</button> <button class="btn outline" onclick="trackno.value='${o.orderNumber}';go('tracking');track()">تتبع الطلب</button>`;
     go('invoice');
 }
 
-function track(){let n=trackno.value.trim(),o=orders.find(x=>x.number.toLowerCase()===n.toLowerCase());trackresult.innerHTML=o?`<div class="panel"><div class="line"><b>رقم الطلب</b><b class="orderno">${o.number}</b></div><div class="line"><b>التاريخ</b><b dir="ltr">${o.date}</b></div><div class="steps"><span><b>✓</b>تم الاستلام</span><span><b>□</b>قيد التجهيز</span><span><b>□</b>تم الشحن</span><span><b>□</b>تم التوصيل</span></div><p>الحالة: <b style="color:var(--r)">${o.status}</b></p><b>الإجمالي: ${money(o.total)}</b></div>`:'<div class="panel">لم يتم العثور على الطلب في هذا المتصفح.</div>'}
-function drawAccount(){let o=orders[0];customerinfo.innerHTML=o?`الاسم: ${o.customer.name}<br>الهاتف: ${o.customer.phone}<br>المدينة: ${o.customer.city}`:'لا توجد بيانات بعد';myorders.innerHTML=orders.length?orders.map(o=>`<div class="line"><span>${o.number} · ${o.date}</span><button class="btn outline" onclick="trackno.value='${o.number}';go('tracking');track()">تتبع</button></div>`).join(''):'لا توجد طلبات محفوظة.'}
+function track(){let n=trackno.value.trim().replace('#',''),o=orders.find(x=>String(x.orderNumber)===n);trackresult.innerHTML=o?`<div class="panel"><div class="line"><b>رقم الطلب</b><b class="orderno">#${o.orderNumber}</b></div><div class="line"><b>التاريخ</b><b dir="ltr">${o.date}</b></div><div class="steps"><span><b>✓</b>تم الاستلام</span><span><b>□</b>قيد التجهيز</span><span><b>□</b>تم الشحن</span><span><b>□</b>تم التوصيل</span></div><p>الحالة: <b style="color:var(--r)">${o.status}</b></p><b>الإجمالي: ${money(o.total)}</b></div>`:'<div class="panel">لم يتم العثور على الطلب في هذا المتصفح.</div>'}
+function drawAccount(){let o=orders[0];customerinfo.innerHTML=o?`الاسم: ${o.customer.name}<br>الهاتف: ${o.customer.phone}<br>المدينة: ${o.customer.city}`:'لا توجد بيانات بعد';myorders.innerHTML=orders.length?orders.map(o=>`<div class="line"><span>#${o.orderNumber} · ${o.date}</span><button class="btn outline" onclick="trackno.value='${o.orderNumber}';go('tracking');track()">تتبع</button></div>`).join(''):'لا توجد طلبات محفوظة.'}
 
 drawCats();renderProducts();save();
 </script></body></html>
