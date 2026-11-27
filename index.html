@@ -20,11 +20,8 @@
 </main>
 <nav class="bottom"><button class="nav active" data-p="home" onclick="go('home')"><i>⌂</i>الرئيسية</button><button class="nav" data-p="categories" onclick="go('categories')"><i>▦</i>الأقسام</button><button class="nav" data-p="cart" onclick="go('cart')"><i>🛒</i>السلة</button><button class="nav" data-p="favorites" onclick="go('favorites')"><i>♡</i>المفضلة</button><button class="nav" data-p="account" onclick="go('account')"><i>♙</i>حسابي</button></nav><div id="toast" class="toast"></div>
 <script>
-// 1. تصفير جميع البيانات (متجر جديد)
-const defaultData = {
-    categories: ['الكل'],
-    products: []
-};
+// 1. تصفير جميع البيانات (متجر جديد تماماً)
+const defaultData = { categories: ['الكل'], products: [] };
 
 function getStoreData() {
     try {
@@ -44,18 +41,14 @@ function getStoreData() {
 
 let storeData = getStoreData();
 let products = storeData.products.map(p => ({
-    id: p.id,
-    name: p.name,
-    cat: p.category || p.cat,
-    price: Number(p.price),
-    old: Number(p.price) + 100,
-    icon: p.emoji || p.icon || '📦',
-    image: p.image || '',
+    id: p.id, name: p.name, cat: p.category || p.cat,
+    price: Number(p.price), old: Number(p.price) + 100,
+    icon: p.emoji || p.icon || '📦', image: p.image || '',
     desc: p.desc || p.description || ''
 }));
 let cats = storeData.categories.filter(c => c !== 'الكل').map(c => [c, '📦']);
 
-// 2. دالة توليد رقم الطلب التسلسلي (1, 2, 3...)
+// 2. دالة الترقيم التسلسلي (1, 2, 3...)
 function getNextOrderNumber() {
     try {
         let currentData = JSON.parse(localStorage.getItem('rai_store_data_v1') || '{}');
@@ -63,37 +56,27 @@ function getNextOrderNumber() {
         let maxId = 0;
         orders.forEach(o => {
             let num = parseInt(o.id || o.orderNumber);
-            if (!isNaN(num) && num > maxId) {
-                maxId = num;
-            }
+            if (!isNaN(num) && num > maxId) maxId = num;
         });
-        return maxId + 1; // الرقم التالي
-    } catch(e) {
-        return 1; // يبدأ من 1 إذا كان فارغاً
-    }
+        return maxId + 1;
+    } catch(e) { return 1; }
 }
 
-// 3. حفظ الطلب في لوحة التحكم
+// 3. حفظ الطلب في لوحة التحكم بالرقم التسلسلي
 function saveOrderToDashboard(order) {
     try {
         let currentData = JSON.parse(localStorage.getItem('rai_store_data_v1') || '{}');
         if (!currentData.orders) currentData.orders = [];
-        
         const adminOrder = {
             id: order.orderNumber,
-            name: order.customer.name,
-            phone: order.customer.phone,
-            city: order.customer.city,
-            address: order.customer.address,
-            total: order.total,
-            date: order.date,
-            status: 'جديد',
+            name: order.customer.name, phone: order.customer.phone,
+            city: order.customer.city, address: order.customer.address,
+            total: order.total, date: order.date, status: 'جديد',
             items: order.items.map(i => ({ name: i.name, qty: i.qty, price: i.price }))
         };
-        
         currentData.orders.push(adminOrder);
         localStorage.setItem('rai_store_data_v1', JSON.stringify(currentData));
-    } catch(e) { console.error("خطأ في حفظ الطلب", e); }
+    } catch(e) {}
 }
 
 let cart=JSON.parse(localStorage.getItem('rai_cart')||'[]'),favs=JSON.parse(localStorage.getItem('rai_favs')||'[]'),orders=JSON.parse(localStorage.getItem('rai_orders')||'[]'),filter='';
