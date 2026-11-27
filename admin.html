@@ -354,7 +354,7 @@ const AUTH='rai_admin_auth';
 const SET='rai_store_settings';
 const LEGACY_AUTH={username:'asd',password:'asd700069'};
 
-// تصفير البيانات الافتراضية (متجر جديد)
+// تصفير البيانات الافتراضية
 const baseData={
  categories:['الكل'],
  products:[],
@@ -697,4 +697,4 @@ window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setT
 </script>
 <div id="invoiceModal" style="display:none;position:fixed;inset:0;z-index:1000;background:#000c;padding:12px;overflow:auto;align-items:flex-start;justify-content:center"><div style="width:min(720px,100%);margin:18px auto;background:#fff;color:#222;border-radius:14px;padding:18px"><div id="adminInvoiceContent"></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:15px"><button class="btn" onclick="printCurrentInvoice()">طباعة الفاتورة</button><button class="mini-btn" onclick="document.getElementById('invoiceModal').style.display='none'">إغلاق</button></div></div></div>
 </body>
-     </html>
+</html>
